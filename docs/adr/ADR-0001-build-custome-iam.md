@@ -1,0 +1,3 @@
+> Pourquoi développer **ComLabs IAM** plutôt qu'intégrer directement une solution existante comme Keycloak ou Authentik ?
+
+Cette ADR expliquera que notre objectif n'est pas seulement de disposer d'un IAM, mais aussi de maîtriser son architecture, de l'adapter à nos besoins, de comprendre en profondeur les mécanismes d'authentification et d'obtenir un composant réutilisable pour toute la suite **ComLabs**.
