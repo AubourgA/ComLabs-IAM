@@ -1,8 +1,8 @@
 # Domain Model 005 - Security Policy
 
 **Status** : Accepted  
-**Version** : 2.0  
-**Last Update** : 2026-07-06
+**Version** : 2.1  
+**Last Update** : 2026-07-07
 
 ---
 
@@ -34,6 +34,7 @@ Le domaine Security Policy est responsable de :
 - centraliser les exigences de sécurité ;
 - garantir un comportement homogène pour toutes les applications ;
 - permettre l'évolution des règles sans modifier le modèle métier.
+- définir les règles de sécurité applicables aux Sessions et aux Devices ;
 
 ---
 
@@ -70,6 +71,7 @@ Le domaine Security Policy collabore avec :
 - Authentication
 - Credential
 - Session
+- Device
 - Identity
 
 Ces domaines appliquent les règles définies par la Security Policy.
@@ -117,7 +119,34 @@ La première version prévoit notamment :
 Chaque politique possède une responsabilité unique.
 
 ---
+# Gestion des Sessions et des Devices
 
+Le domaine **Security Policy** définit les règles qui gouvernent la création, le maintien et la révocation des Sessions.
+
+Le domaine **Session** applique ces décisions mais ne les prend jamais.
+
+De la même manière, le domaine **Security Policy** exploite les informations fournies par le domaine **Device** afin de déterminer si une connexion est autorisée.
+
+Cette séparation garantit une responsabilité claire entre les domaines.
+
+## Exemples de règles
+
+Une Security Policy peut notamment définir :
+
+- le nombre maximal de Sessions simultanées ;
+- le nombre maximal de Devices autorisés ;
+- la durée de vie maximale d'une Session ;
+- le délai d'expiration par inactivité ;
+- l'activation du Remember Me ;
+- les règles applicables aux Devices de confiance ;
+- le comportement lors d'une connexion depuis un nouveau Device ;
+- l'obligation d'une authentification multifacteur (MFA) ;
+- la fermeture automatique des Sessions lors d'un changement de mot de passe ;
+- la fermeture automatique des Sessions lors de la désactivation d'une Identity.
+
+Le domaine Session applique ces décisions sans jamais les définir.
+
+---
 # Principes
 
 ## Les règles sont centralisées
@@ -125,6 +154,8 @@ Chaque politique possède une responsabilité unique.
 Toutes les règles de sécurité sont définies dans ComLabs IAM.
 
 Les applications clientes ne doivent jamais implémenter leurs propres règles d'authentification.
+
+Cette séparation permet de modifier les politiques de sécurité sans impacter le fonctionnement interne des domaines métier.
 
 ---
 
@@ -158,15 +189,18 @@ Le moteur est conçu pour accompagner l'évolution des besoins de sécurité.
 - Une seule politique globale est active pour toute l'organisation.
 - Les applications clientes appliquent les politiques définies par ComLabs IAM.
 - Les politiques spécialisées sont indépendantes.
+- Les domaines métier ne définissent jamais leurs propres règles de sécurité.
+- Toutes les contraintes liées aux Sessions et aux Devices sont pilotées par Security Policy.
 - Le moteur adopte une architecture orientée Policy Driven.
 
 ---
 
 # Évolutions prévues
 
+
 Les futures versions pourront intégrer de nouvelles politiques, notamment :
 
-- Device Policy
+- Session Policy (extensions)
 - Risk Policy
 - Geolocation Policy
 - Trusted Network Policy
