@@ -1,0 +1,158 @@
+# ADR-006 — Business Roles and Permissions Are Managed by Client Applications
+
+**Status** : Accepted  
+**Date** : 2026-07-08
+
+---
+
+# Contexte
+
+Lors de la conception de ComLabs IAM, une question importante est apparue :
+
+> Les rôles et les permissions métier doivent-ils être gérés par ComLabs IAM ou par les applications clientes ?
+
+Au départ, le modèle prévoyait les domaines **Role** et **Permission** comme faisant partie intégrante de ComLabs IAM.
+
+Après analyse du domaine métier, cette approche s'est révélée contraire aux objectifs du projet.
+
+ComLabs IAM est conçu comme un **Identity Provider** indépendant des applications qu'il protège.
+
+Son rôle est de gérer les identités, l'authentification, les sessions et l'autorisation d'accès aux applications, mais pas les règles métier propres à ces applications.
+
+---
+
+# Décision
+
+Les rôles et les permissions métier sont gérés exclusivement par les applications clientes.
+
+ComLabs IAM ne possède aucune connaissance des rôles ou des permissions spécifiques aux domaines métiers des applications.
+
+Il se limite à déterminer si une Identity est autorisée à accéder à un Client.
+
+Une fois l'accès autorisé, chaque application devient responsable de ses propres règles d'autorisation.
+
+---
+
+# Justification
+
+Les rôles métier dépendent directement des fonctionnalités de chaque application.
+
+Par exemple :
+
+```text
+ComLabs Labo
+
+- Responsable Béton
+- Technicien
+- Facturation
+```
+
+```text
+ComLabs R&D
+
+- Chercheur
+- Responsable Projet
+```
+
+```text
+ComLabs Sampling
+
+- Préleveur
+- Responsable Qualité
+```
+
+Ces rôles n'ont aucun sens en dehors de leur domaine métier.
+
+Les intégrer dans ComLabs IAM créerait un fort couplage entre l'Identity Provider et les applications clientes.
+
+Cela irait à l'encontre des principes de séparation des responsabilités et limiterait la réutilisabilité du moteur IAM.
+
+---
+
+# Conséquences
+
+ComLabs IAM devient responsable de :
+
+- la gestion des Identities ;
+- l'authentification ;
+- la gestion des Sessions ;
+- l'autorisation d'accès aux Clients ;
+- l'application des Security Policies ;
+- la traçabilité des événements de sécurité.
+
+Les applications clientes deviennent responsables de :
+
+- leurs rôles métier ;
+- leurs permissions métier ;
+- leurs règles d'autorisation internes ;
+- leurs menus ;
+- leurs fonctionnalités ;
+- leurs API métier.
+
+---
+
+# Exception
+
+ComLabs IAM peut définir des rôles techniques destinés exclusivement à sa propre administration.
+
+Exemples :
+
+- Administrateur IAM
+- Auditeur IAM
+- Responsable Sécurité IAM
+
+Ces rôles ne doivent jamais être utilisés par les applications clientes pour gérer leurs propres autorisations métier.
+
+---
+
+# Principes
+
+Cette décision garantit que :
+
+- ComLabs IAM reste indépendant des domaines métiers ;
+- les applications évoluent sans impacter l'Identity Provider ;
+- chaque domaine conserve une responsabilité unique ;
+- l'architecture reste conforme aux principes du Domain-Driven Design (DDD).
+
+---
+
+# Conséquences sur le Domain Model
+
+Les domaines suivants sont retirés du cœur métier de ComLabs IAM :
+
+- Role
+- Permission
+
+Ils seront définis et implémentés dans chaque application cliente selon ses propres besoins.
+
+Le Domain Model de ComLabs IAM reste centré sur les concepts d'identité et de sécurité.
+
+---
+
+# Alternatives étudiées
+
+## Gestion des rôles dans ComLabs IAM
+
+Cette solution a été rejetée car elle introduit une dépendance forte entre ComLabs IAM et les métiers des applications.
+
+---
+
+## Gestion hybride
+
+Une approche hybride avec des rôles globaux dans ComLabs IAM et des rôles métier dans les applications a également été étudiée.
+
+Cette solution a été jugée inutilement complexe pour les besoins actuels.
+
+Elle pourra être réévaluée ultérieurement si de nouveaux besoins apparaissent.
+
+---
+
+# Conclusion
+
+ComLabs IAM est un fournisseur d'identité.
+
+Son objectif est de sécuriser l'accès aux applications, et non de gérer leur logique métier.
+
+Les rôles et les permissions appartiennent au domaine métier de chaque application cliente.
+
+Cette décision garantit une architecture plus simple, plus évolutive et mieux découplée.
